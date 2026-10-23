@@ -1,0 +1,143 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #eceef0;
+  background: #111214;
+  font-synthesis: none;
+  color-scheme: dark;
+  font-size: 13px;
+  --muted: #92969e;
+  --line: #303237;
+  --accent: #b5c9d8;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+select {
+  color: inherit;
+  background: #25272b;
+  border: 1px solid #41444a;
+  border-radius: 5px;
+  padding: 9px 12px;
+}
+button {
+  cursor: pointer;
+}
+button:hover {
+  background: #34373d;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #b5c9d8;
+  outline-offset: 3px;
+}
+.app {
+  height: 100dvh;
+  min-height: 650px;
+  display: flex;
+  flex-direction: column;
+}
+.app-header {
+  height: 64px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 26px;
+}
+.app-header strong {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+.app-header > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.studio {
+  display: grid;
+  grid-template-columns: minmax(0, 1.24fr) minmax(400px, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+.workspace {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: #181a1d;
+  border-right: 1px solid var(--line);
+}
+.workspace-toolbar {
+  position: absolute;
+  z-index: 3;
+  top: 22px;
+  left: 22px;
+  right: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inspector {
+  padding: 22px;
+  min-width: 0;
+  overflow: auto;
+  background: #17181b;
+}
+.inspector h1 {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 16px;
+}
+@media (max-width: 900px) {
+  .studio {
+    grid-template-columns: minmax(0, 1fr) 370px;
+  }
+  .inspector {
+    padding: 16px;
+  }
+  .workspace-toolbar {
+    left: 12px;
+    right: 12px;
+    gap: 6px;
+  }
+}
+@media (max-width: 700px) {
+  .app {
+    height: auto;
+    min-height: 100dvh;
+  }
+  .studio {
+    display: flex;
+    flex-direction: column;
+  }
+  .workspace {
+    height: 55dvh;
+    min-height: 350px;
+  }
+  .inspector {
+    overflow: visible;
+  }
+  .app-header > span {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
