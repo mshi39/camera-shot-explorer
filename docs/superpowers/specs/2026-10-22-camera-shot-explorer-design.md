@@ -59,7 +59,7 @@ Input ownership is explicit:
 
 Position mode exposes horizontal orbit, vertical orbit, and distance. Users may adjust each value through synchronized numerical sliders and direct 3D handles. Direct manipulation uses constrained handles so a two-dimensional pointer gesture maps predictably to one three-dimensional parameter.
 
-Horizontal orbit supports a full 360 degrees. Vertical orbit is limited to -80 through 80 degrees to avoid polar singularities. Camera distance is limited to 1.5 through 20 meters to prevent clipping through the subject and keep the camera within the useful workspace.
+Horizontal orbit supports a full 360 degrees. Vertical orbit is limited to -80 through 80 degrees to avoid polar singularities. Camera radius from the orbit center is limited to 0.35 through 20 meters, enabling facial detail framing. This is not mesh collision avoidance; very close placements can intersect the mannequin.
 
 ## Rotation controls
 
@@ -111,7 +111,7 @@ The executable definitions are:
 - Close-Up: the face dominates the frame, generally from the shoulders, neck, or lower face through the top of the head.
 - Extreme Close-Up: only part of the face or an individual facial feature fills the frame, or the complete face no longer fits comfortably.
 
-Classification uses a two-percent-of-frame-height tolerance band around each landmark boundary and retains the previous category while the framing remains inside that band. This prevents rapid label flicker during manipulation. A shot is Unclassified when less than 25 percent of the projected subject bounds intersects the frame, required landmarks are unavailable, or no category can be selected outside the tolerance bands.
+Classification uses a two-percent-of-frame-height tolerance band around each landmark boundary and retains the previous category while the framing remains inside that band. This prevents rapid label flicker during manipulation. A shot is Unclassified when less than 25 percent of projected subject bounds intersects the frame unless a visible facial landmark supports close framing. Full/Long Shot requires lateral containment as well as head-to-foot visibility. A partly clipped head only implies ECU at sufficiently large subject scale; ambiguous crops return Unclassified. Visible facial detail remains eligible when the torso is outside or behind the lens.
 
 Camera-angle classification considers both camera height and viewing direction. V1 identifies Eye Level, High Angle, Low Angle, and Overhead. Subject-relative viewpoint identifies Front, Three-Quarter Front, Profile, Rear Three-Quarter, and Back based on the subject's forward direction and camera bearing.
 
