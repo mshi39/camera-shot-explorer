@@ -35,7 +35,8 @@ export function applyFilmingCamera(
   camera.near = 0.025;
   camera.far = 100;
   camera.position.copy(positionFromOrbit(s));
-  camera.rotation.copy(cameraEuler(s));
+  // Match the preview's visible tilt to the workspace body's roll direction.
+  camera.rotation.copy(cameraEuler({ ...s, roll: -s.roll }));
   camera.updateProjectionMatrix();
   camera.updateMatrixWorld(true);
 }

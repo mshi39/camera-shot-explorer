@@ -5,6 +5,7 @@ import {
   type FilmingCameraState,
   type ObservationCameraState,
   type ControlMode,
+  type CameraParameter,
 } from "./cameraTypes";
 import { lookAtEyesPreservingRoll } from "./cameraMath";
 import { restoreSession, saveSession, SESSION_KEY } from "./cameraPersistence";
@@ -21,6 +22,8 @@ interface CameraStore {
   mode: ControlMode;
   selected: boolean;
   dragging: boolean;
+  activeHandle: CameraParameter | null;
+  setActiveHandle: (handle: CameraParameter | null) => void;
   revision: number;
   updateCamera: (patch: Partial<FilmingCameraState>) => void;
   resetPosition: () => void;
@@ -36,6 +39,7 @@ export const useCameraStore = create<CameraStore>((set, get) => ({
   mode: "position",
   selected: true,
   dragging: false,
+  activeHandle: null,
   revision: 0,
   updateCamera: (patch) =>
     set((state) => {
@@ -70,7 +74,8 @@ export const useCameraStore = create<CameraStore>((set, get) => ({
   },
   lookAtSubject: () =>
     get().updateCamera(lookAtEyesPreservingRoll(get().filming)),
-  setMode: (mode) => set({ mode }),
+  setMode: (mode) => set({ mode, activeHandle: null }),
+  setActiveHandle: (activeHandle) => set({ activeHandle, selected: true }),
   setSelected: (selected) => set({ selected }),
   setDragging: (dragging) => set({ dragging }),
   setObservation: (observation) => set({ observation }),

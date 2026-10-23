@@ -9,25 +9,71 @@ import { PromptPanel } from "../prompt/PromptPanel";
 import { ShotInformation } from "../ui/ShotInformation";
 import { useClassification } from "../classification/useClassification";
 import { useCameraStore } from "../camera/cameraStore";
+import type { CameraParameter } from "../camera/cameraTypes";
 export default function App() {
   const shot = useClassification(),
     aspect = useCameraStore((s) => s.filming.aspect),
     mode = useCameraStore((s) => s.mode),
+    activeHandle = useCameraStore((s) => s.activeHandle),
     [help, setHelp] = useState(false);
+  const axes: { key: CameraParameter; label: string }[] =
+    mode === "position"
+      ? [
+          { key: "horizontal", label: "H" },
+          { key: "vertical", label: "V" },
+          { key: "distance", label: "D" },
+        ]
+      : [
+          { key: "yaw", label: "Y" },
+          { key: "pitch", label: "P" },
+          { key: "roll", label: "R" },
+        ];
   return (
     <main className="app">
       <header className="app-header">
         <Aperture size={22} strokeWidth={1.3} />
         <strong>Camera Shot Explorer</strong>
         <span>A study in perspective</span>
-        <button
-          className="help-toggle"
-          aria-label="Interaction guide"
-          aria-expanded={help}
-          onClick={() => setHelp(!help)}
+        <div
+          className="help-anchor"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setHelp(false);
+          }}
         >
-          <CircleHelp size={16} />
-        </button>
+          <button
+            className="help-toggle"
+            aria-label="Interaction guide"
+            aria-expanded={help}
+            aria-controls="interaction-guide"
+            onClick={() => setHelp(!help)}
+          >
+            <CircleHelp size={16} />
+          </button>
+          {help && (
+            <div
+              id="interaction-guide"
+              className="help-panel"
+              role="region"
+              aria-label="Interaction guide details"
+            >
+              <strong>Explore your shot</strong>
+              <p>
+                Drag the background to orbit your view. Scroll to zoom the
+                workspace.
+              </p>
+              <p>
+                Select and drag the camera. Use H / V / D in Position mode or Y
+                / P / R in Rotation mode to restrict dragging to one axis. Press
+                the same key again or Esc to release it.
+              </p>
+              <p>
+                <kbd>S</kbd> switches modes. <kbd>Shift+R</kbd> resets position or rotation in the active mode.{" "}
+                <kbd>L</kbd> aims at the subject.
+              </p>
+              <button onClick={() => setHelp(false)}>Got it</button>
+            </div>
+          )}
+        </div>
       </header>
       <div className="studio">
         <section
@@ -61,10 +107,31 @@ export default function App() {
                 <Rotate3D size={14} />
               )}
               <span>Camera selected</span>
-              <span className="muted">
-                {mode === "position"
-                  ? "H / V / D handles"
-                  : "Yaw / Pitch / Roll rings"}
+              <div
+                className="axis-shortcuts"
+                role="group"
+                aria-label="Restrict camera drag"
+              >
+                {axes.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    title={`Restrict drag to ${key} (${label})`}
+                    aria-label={`Select ${key} handle`}
+                    aria-pressed={activeHandle === key}
+                    onClick={() =>
+                      useCameraStore
+                        .getState()
+                        .setActiveHandle(activeHandle === key ? null : key)
+                    }
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <span className="muted" role="status">
+                {activeHandle
+                  ? `${activeHandle} only · Esc to release`
+                  : "Drag camera or handles"}
               </span>
             </div>
             <div className="navigation-hint">
@@ -74,25 +141,6 @@ export default function App() {
               <span>Scroll to zoom</span>
             </div>
           </div>
-          {help && (
-            <div className="help-panel">
-              <strong>Explore your shot</strong>
-              <p>
-                Drag the background to orbit your view. Scroll to zoom the
-                workspace.
-              </p>
-              <p>
-                Select and drag the camera to{" "}
-                {mode === "position" ? "move it" : "rotate it"}. Use the handles
-                for a single axis, or the sliders for precision.
-              </p>
-              <p>
-                <kbd>S</kbd> switches Position and Rotation. Use the reset menu
-                to aim at the subject.
-              </p>
-              <button onClick={() => setHelp(false)}>Got it</button>
-            </div>
-          )}
         </section>
         <aside className="inspector">
           <div className="preview-heading">

@@ -5,11 +5,33 @@
   color: #c4c8cd;
 }
 .help-toggle {
-  margin-left: auto;
   padding: 6px;
   border: 0;
   background: transparent;
   color: #969ca5;
+}
+.help-anchor {
+  position: relative;
+  margin-left: auto;
+  z-index: 10;
+}
+.axis-shortcuts {
+  display: flex;
+  gap: 4px;
+  pointer-events: auto;
+}
+.axis-shortcuts button {
+  padding: 3px 7px;
+  font-size: 10px;
+}
+.axis-shortcuts button[aria-pressed="true"] {
+  color: #fff;
+  border-color: #d2d6dd;
+  background: #4a4e55;
+}
+.handle-label.active {
+  color: #fff;
+  outline: 1px solid #e0e3e7;
 }
 .app-footer {
   height: 30px;
@@ -382,21 +404,21 @@
   width: 100%;
   height: 10px;
   margin: 0;
-  accent-color: #aebfcd;
+  accent-color: var(--slider-color);
   cursor: ew-resize;
   appearance: none;
   background: transparent;
 }
 .control-row input[type="range"]::-webkit-slider-runnable-track {
   height: 3px;
-  background: #3e444d;
+  background: linear-gradient(to right, var(--slider-color) var(--slider-fill), #3e444d var(--slider-fill));
   border-radius: 4px;
 }
 .control-row input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 10px;
   height: 10px;
-  background: #bdcbd6;
+  background: var(--slider-color);
   border-radius: 50%;
   margin-top: -3.5px;
   box-shadow: 0 0 0 3px #1b1d21;
@@ -409,8 +431,13 @@
   width: 10px;
   height: 10px;
   border: 0;
-  background: #bdcbd6;
+  background: var(--slider-color);
   border-radius: 50%;
+}
+.control-row input[type="range"]::-moz-range-progress {
+  height: 3px;
+  background: var(--slider-color);
+  border-radius: 4px;
 }
 .prompt-panel {
   padding-top: 16px;
@@ -480,10 +507,9 @@
 }
 .help-panel {
   position: absolute;
-  top: 78px;
-  left: 22px;
-  right: 22px;
-  max-width: 360px;
+  top: calc(100% + 12px);
+  right: 0;
+  width: min(360px, calc(100vw - 40px));
   background: #25282ef5;
   border: 1px solid #474d57;
   border-radius: 8px;

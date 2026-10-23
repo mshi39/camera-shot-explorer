@@ -86,13 +86,33 @@ export function classifyShot(
 ): ShotClassification {
   const f = projectSubject(s),
     camera = createFilmingCamera(s),
-    height = camera.position.y - 1.64;
+    height = camera.position.y;
   const forward = camera.getWorldDirection(new Vector3());
-  let angle = "Eye Level";
-  if (forward.y < -0.9 && height > 0.35) angle = "Overhead";
-  else if (height > 0.2 && forward.y < -0.04) angle = "High Angle";
-  else if (height < -0.2 && forward.y > 0.04) angle = "Low Angle";
-  else if (Math.abs(height) > 0.2) angle = "Unclassified";
+  const levels = [
+    { height: SUBJECT_LANDMARKS.eyes[1], name: "Eye Level" },
+    { height: SUBJECT_LANDMARKS.shoulders[1], name: "Shoulder Level" },
+    { height: SUBJECT_LANDMARKS.chest[1], name: "Chest Level" },
+    { height: SUBJECT_LANDMARKS.waist[1], name: "Waist Level" },
+    { height: SUBJECT_LANDMARKS.hips[1], name: "Hip Level" },
+    { height: SUBJECT_LANDMARKS.thigh[1], name: "Thigh Level" },
+    { height: SUBJECT_LANDMARKS.knees[1], name: "Knee Level" },
+    { height: SUBJECT_LANDMARKS.shins[1], name: "Shin Level" },
+    { height: SUBJECT_LANDMARKS.knees[1] / 2, name: "Tatami Level" },
+    { height: SUBJECT_LANDMARKS.ankles[1], name: "Ankle Level" },
+    { height: 0, name: "Ground Level" },
+  ];
+  let angle = "Unclassified";
+  if (height >= -1e-9 && height <= SUBJECT_LANDMARKS.eyes[1] + .08) {
+    angle = levels.reduce((nearest, level) =>
+      Math.abs(height - level.height) < Math.abs(height - nearest.height) ? level : nearest,
+    ).name;
+  }
+  if (
+    height > SUBJECT_LANDMARKS.head[1] + 0.05 &&
+    Math.hypot(camera.position.x, camera.position.z) <= 0.08 &&
+    forward.y <= -Math.cos((5 * Math.PI) / 180)
+  )
+    angle = "Overhead Level";
   const bearing = Math.abs(s.horizontal);
   const viewpoint =
     bearing < 22.5
@@ -107,7 +127,7 @@ export function classifyShot(
   const size = classifyFraming(f, previous?.size);
   return {
     size,
-    angle: size === "Unclassified" ? "Unclassified" : angle,
+    angle,
     viewpoint,
     composition:
       size === "Unclassified"

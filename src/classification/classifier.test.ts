@@ -3,6 +3,51 @@ import { classifyShot, projectSubject, classifyFraming } from "./classifier";
 import { DEFAULT_CAMERA_STATE } from "../camera/cameraTypes";
 import { lookAtEyesPreservingRoll } from "../camera/cameraMath";
 
+test.each([
+  [1.64, "Eye Level"],
+  [1.44, "Shoulder Level"],
+  [1.28, "Chest Level"],
+  [0.96, "Waist Level"],
+  [0.89, "Hip Level"],
+  [0.73, "Thigh Level"],
+  [0.49, "Knee Level"],
+  [0.35, "Shin Level"],
+  [0.245, "Tatami Level"],
+  [0.1, "Ankle Level"],
+  [0.01, "Ground Level"],
+  [1.2, "Chest Level"],
+  [2.2, "Unclassified"],
+  [-0.2, "Unclassified"],
+])(
+  "camera height %s identifies %s independently of shot size",
+  (height, level) => {
+    const y = Number(height) - 1;
+    const s = {
+      ...DEFAULT_CAMERA_STATE,
+      vertical: (Math.atan2(y, 3) * 180) / Math.PI,
+      distance: Math.hypot(y, 3),
+      pitch: 0,
+    };
+    expect(classifyShot(s).angle).toBe(level);
+  },
+);
+
+test("camera levels have no gaps from eye height to the floor and ignore lens tilt", () => {
+  for (let i=0;i<=164;i++) {
+    const y=i/100-1;
+    const s={...DEFAULT_CAMERA_STATE,vertical:Math.atan2(y,3)*180/Math.PI,distance:Math.hypot(y,3)};
+    const level=classifyShot(s).angle;
+    expect(level).not.toBe("Unclassified");
+    expect(classifyShot({...s,pitch:75}).angle).toBe(level);
+  }
+});
+test("Overhead Level requires placement directly above the head and a downward lens", () => {
+  const s = { ...DEFAULT_CAMERA_STATE, vertical: 90, distance: 2, pitch: -90 };
+  expect(classifyShot(s).angle).toBe("Overhead Level");
+  expect(classifyShot({ ...s, vertical: 80 }).angle).toBe("Unclassified");
+  expect(classifyShot({ ...s, pitch: 0 }).angle).toBe("Unclassified");
+});
+
 test("full-height but sideways clipped subjects are not full shots", () => {
   expect(
     classifyShot({

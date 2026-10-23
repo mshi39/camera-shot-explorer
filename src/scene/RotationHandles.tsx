@@ -5,6 +5,7 @@ import { useCameraDrag } from "./useCameraDrag";
 import type { Vec3 } from "../camera/cameraTypes";
 export function RotationHandles() {
   const s = useCameraStore((x) => x.filming);
+  const active = useCameraStore((x) => x.activeHandle);
   const drag = useCameraDrag();
   const rings: {
     key: "yaw" | "pitch" | "roll";
@@ -16,14 +17,14 @@ export function RotationHandles() {
     {
       key: "yaw",
       rotation: [Math.PI / 2, 0, 0],
-      color: "#b6c4cf",
+      color: "#c29a9a",
       radius: 0.46,
       label: [0.5, 0, 0],
     },
     {
       key: "pitch",
       rotation: [0, Math.PI / 2, 0],
-      color: "#e0e2e4",
+      color: "#9bb9a2",
       radius: 0.5,
       label: [0, 0.54, 0],
     },
@@ -42,7 +43,7 @@ export function RotationHandles() {
           <mesh rotation={r.rotation} onPointerDown={(e) => drag(r.key, e)}>
             <torusGeometry args={[r.radius, 0.009, 8, 96]} />
             <meshBasicMaterial
-              color={r.color}
+              color={active === r.key ? "#ffffff" : r.color}
               transparent
               opacity={0.85}
               depthTest={false}
@@ -54,14 +55,21 @@ export function RotationHandles() {
           </mesh>
           <mesh position={r.label} onPointerDown={(e) => drag(r.key, e)}>
             <sphereGeometry args={[0.055, 16, 12]} />
-            <meshBasicMaterial color={r.color} depthTest={false} />
+            <meshBasicMaterial
+              color={active === r.key ? "#ffffff" : r.color}
+              depthTest={false}
+            />
           </mesh>
           <Html
             position={[r.label[0], r.label[1] + 0.1, r.label[2]]}
             center
             style={{ pointerEvents: "none" }}
           >
-            <span className="handle-label">{r.key}</span>
+            <span
+              className={`handle-label ${active === r.key ? "active" : ""}`}
+            >
+              {r.key[0].toUpperCase()}
+            </span>
           </Html>
         </group>
       ))}

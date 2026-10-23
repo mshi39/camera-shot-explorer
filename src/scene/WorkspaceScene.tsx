@@ -78,11 +78,12 @@ function Guides() {
 }
 function InteractiveCamera() {
   const mode = useCameraStore((s) => s.mode),
+    activeHandle = useCameraStore((s) => s.activeHandle),
     selected = useCameraStore((s) => s.selected);
   const drag = useCameraDrag();
   return (
     <>
-      <FilmingCameraModel onDrag={(e) => drag(mode, e)} />
+      <FilmingCameraModel onDrag={(e) => drag(activeHandle ?? mode, e)} />
       {selected &&
         (mode === "position" ? <PositionHandles /> : <RotationHandles />)}
     </>

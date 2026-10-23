@@ -3,10 +3,21 @@ import { Vector3 } from "three";
 import { DEFAULT_CAMERA_STATE } from "./cameraTypes";
 import {
   createFilmingCamera,
+  cameraEuler,
   positionFromOrbit,
   lookAtEyesPreservingRoll,
 } from "./cameraMath";
 describe("camera projection and transforms", () => {
+  test.each([-30, 30])("preview tilt matches workspace roll %s", (roll) => {
+    const state = { ...DEFAULT_CAMERA_STATE, yaw: 0, pitch: 0, roll };
+    const camera = createFilmingCamera(state);
+    const bodyUp = new Vector3(0, 1, 0).applyEuler(cameraEuler(state));
+    const top = new Vector3(0, 1.8, 0).project(camera);
+    const bottom = new Vector3(0, 0.96, 0).project(camera);
+    expect(Math.sign(top.x - bottom.x)).toBe(Math.sign(bodyUp.x));
+    expect(camera.position.toArray()).toEqual(positionFromOrbit(state).toArray());
+    expect(camera.getWorldDirection(new Vector3()).distanceTo(new Vector3(0, 0, -1))).toBeCloseTo(0);
+  });
   test("starts at eye height and projects a waist-up composition", () => {
     const camera = createFilmingCamera(DEFAULT_CAMERA_STATE);
     expect(camera.position.y).toBeCloseTo(1.64, 2);

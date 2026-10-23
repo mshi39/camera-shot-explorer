@@ -8,6 +8,8 @@ import { DEFAULT_CAMERA_STATE } from "../camera/cameraTypes";
 beforeEach(() =>
   useCameraStore.setState({
     mode: "position",
+    activeHandle: null,
+    dragging: false,
     filming: { ...DEFAULT_CAMERA_STATE },
   }),
 );
@@ -26,6 +28,70 @@ test("S toggles mode but typing and modifiers do not", () => {
   input.focus();
   fireEvent.keyDown(input, { key: "s" });
   expect(useCameraStore.getState().mode).toBe("rotation");
+});
+
+test("mode-aware reset and Look at Subject shortcuts preserve independent transforms", () => {
+  render(<ModeSwitcher />);
+  useCameraStore.getState().updateCamera({ distance: 5, roll: 20 });
+  fireEvent.keyDown(window, { key: "r" });
+  expect(useCameraStore.getState().filming.distance).toBe(5);
+  fireEvent.keyDown(window, { key: "R", shiftKey: true });
+  expect(useCameraStore.getState().filming.distance).toBe(
+    DEFAULT_CAMERA_STATE.distance,
+  );
+  expect(useCameraStore.getState().filming.roll).toBe(20);
+  fireEvent.keyDown(window, { key: "s" });
+  fireEvent.keyDown(window, { key: "r" });
+  expect(useCameraStore.getState().activeHandle).toBe("roll");
+  expect(useCameraStore.getState().filming.roll).toBe(20);
+  fireEvent.keyDown(window, { key: "R", shiftKey: true });
+  expect(useCameraStore.getState().filming.roll).toBe(0);
+  useCameraStore.getState().updateCamera({ yaw: 45 });
+  fireEvent.keyDown(window, { key: "l" });
+  expect(useCameraStore.getState().filming.yaw).toBeCloseTo(0);
+  expect(useCameraStore.getState().filming.pitch).toBeCloseTo(0);
+});
+
+test("axis shortcuts toggle restrictions and mode switching clears them", () => {
+  render(<ModeSwitcher />);
+  for (const [key, axis] of [
+    ["h", "horizontal"],
+    ["v", "vertical"],
+    ["d", "distance"],
+  ]) {
+    fireEvent.keyDown(window, { key });
+    expect(useCameraStore.getState().activeHandle).toBe(axis);
+  }
+  fireEvent.keyDown(window, { key: "d" });
+  expect(useCameraStore.getState().activeHandle).toBeNull();
+  fireEvent.keyDown(window, { key: "h" });
+  fireEvent.keyDown(window, { key: "s" });
+  expect(useCameraStore.getState().activeHandle).toBeNull();
+  for (const [key, axis] of [
+    ["y", "yaw"],
+    ["p", "pitch"],
+    ["r", "roll"],
+  ]) {
+    fireEvent.keyDown(window, { key });
+    expect(useCameraStore.getState().activeHandle).toBe(axis);
+  }
+  fireEvent.keyDown(window, { key: "Escape" });
+  expect(useCameraStore.getState().activeHandle).toBeNull();
+});
+
+test("typing, modifiers and active drags cannot trigger camera shortcuts", () => {
+  render(
+    <>
+      <ModeSwitcher />
+      <input aria-label="typing" />
+    </>,
+  );
+  useCameraStore.getState().updateCamera({ distance: 5 });
+  fireEvent.keyDown(screen.getByRole("textbox"), { key: "r" });
+  fireEvent.keyDown(window, { key: "r", ctrlKey: true });
+  useCameraStore.getState().setDragging(true);
+  fireEvent.keyDown(window, { key: "r" });
+  expect(useCameraStore.getState().filming.distance).toBe(5);
 });
 test("dropdown exposes alternate actions without resetting on open", () => {
   useCameraStore.getState().updateCamera({ horizontal: 45, roll: 20 });

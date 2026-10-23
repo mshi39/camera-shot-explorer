@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Move, Rotate3D } from "lucide-react";
 import { useCameraStore } from "../camera/cameraStore";
+import type { CameraParameter } from "../camera/cameraTypes";
 export function ModeSwitcher() {
   const mode = useCameraStore((s) => s.mode),
     setMode = useCameraStore((s) => s.setMode);
@@ -8,17 +9,34 @@ export function ModeSwitcher() {
     const listener = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (
-        e.key.toLowerCase() !== "s" ||
         e.ctrlKey ||
         e.metaKey ||
         e.altKey ||
         e.repeat ||
+        e.isComposing ||
         target?.closest?.('input,textarea,select,[contenteditable="true"]')
       )
         return;
-      e.preventDefault();
       const s = useCameraStore.getState();
-      s.setMode(s.mode === "position" ? "rotation" : "position");
+      if (s.dragging) return;
+      const key = e.key.toLowerCase();
+      const handles: Record<string, CameraParameter> =
+        s.mode === "position"
+          ? { h: "horizontal", v: "vertical", d: "distance" }
+          : { y: "yaw", p: "pitch", r: "roll" };
+      if (key === "s")
+        s.setMode(s.mode === "position" ? "rotation" : "position");
+      else if (key === "l") s.lookAtSubject();
+      else if (key === "r" && e.shiftKey) {
+        if (s.mode === "position") s.resetPosition();
+        else s.resetRotation();
+      } else if (key === "escape") s.setActiveHandle(null);
+      else if (handles[key])
+        s.setActiveHandle(
+          s.activeHandle === handles[key] ? null : handles[key],
+        );
+      else return;
+      e.preventDefault();
     };
     window.addEventListener("keydown", listener);
     return () => window.removeEventListener("keydown", listener);

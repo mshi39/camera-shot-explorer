@@ -35,10 +35,10 @@ export const DEFAULT_OBSERVATION: ObservationCameraState = {
 };
 export const CAMERA_LIMITS = {
   horizontal: [-180, 180],
-  vertical: [-80, 80],
+  vertical: [-90, 90],
   distance: [0.35, 20],
   yaw: [-180, 180],
-  pitch: [-89, 89],
+  pitch: [-90, 90],
   roll: [-180, 180],
 } as const;
 export type CameraParameter = keyof typeof CAMERA_LIMITS;

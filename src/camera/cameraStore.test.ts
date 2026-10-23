@@ -23,10 +23,17 @@ test("invalid values cannot poison the live camera and limits are enforced", () 
   const store = useCameraStore.getState;
   store().updateCamera({ distance: -10, vertical: 100, yaw: NaN });
   expect(store().filming.distance).toBe(0.35);
-  expect(store().filming.vertical).toBe(80);
+  expect(store().filming.vertical).toBe(90);
   expect(store().filming.yaw).toBe(0);
   store().updateCamera({ distance: 99 });
   expect(store().filming.distance).toBe(20);
+});
+
+test("camera can reach directly above the head and aim straight down", () => {
+  const store = useCameraStore.getState;
+  store().updateCamera({ vertical: 90, distance: 2, pitch: -90 });
+  expect(store().filming.vertical).toBe(90);
+  expect(store().filming.pitch).toBe(-90);
 });
 test("workspace and mode changes do not invalidate the shot revision", () => {
   const store = useCameraStore.getState;

@@ -1,5 +1,5 @@
 import { useCameraStore } from "../camera/cameraStore";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { CAMERA_LIMITS, type CameraParameter } from "../camera/cameraTypes";
 const labels: Record<CameraParameter, string> = {
   horizontal: "Horizontal Orbit",
@@ -8,6 +8,14 @@ const labels: Record<CameraParameter, string> = {
   yaw: "Yaw",
   pitch: "Pitch",
   roll: "Roll",
+};
+const colors: Record<CameraParameter, string> = {
+  horizontal: "#9bb9a2",
+  vertical: "#c29a9a",
+  distance: "#829aac",
+  yaw: "#c29a9a",
+  pitch: "#9bb9a2",
+  roll: "#829aac",
 };
 const tips: Record<CameraParameter, string> = {
   horizontal: "Move around the subject. Camera orientation stays unchanged.",
@@ -67,6 +75,10 @@ export function CameraControls() {
             id={`slider-${key}`}
             aria-label={labels[key]}
             type="range"
+            style={{
+              "--slider-color": colors[key],
+              "--slider-fill": `${((filming[key] - CAMERA_LIMITS[key][0]) / (CAMERA_LIMITS[key][1] - CAMERA_LIMITS[key][0])) * 100}%`,
+            } as CSSProperties}
             min={CAMERA_LIMITS[key][0]}
             max={CAMERA_LIMITS[key][1]}
             step={key === "distance" ? 0.01 : 0.1}

@@ -59,7 +59,7 @@ Input ownership is explicit:
 
 Position mode exposes horizontal orbit, vertical orbit, and distance. Users may adjust each value through synchronized numerical sliders and direct 3D handles. Direct manipulation uses constrained handles so a two-dimensional pointer gesture maps predictably to one three-dimensional parameter.
 
-Horizontal orbit supports a full 360 degrees. Vertical orbit is limited to -80 through 80 degrees to avoid polar singularities. Camera radius from the orbit center is limited to 0.35 through 20 meters, enabling facial detail framing. This is not mesh collision avoidance; very close placements can intersect the mannequin.
+Horizontal orbit supports a full 360 degrees. Vertical orbit and pitch support -90 through 90 degrees so the camera can reach a directly overhead view. Camera radius from the orbit center is limited to 0.35 through 20 meters, enabling facial detail framing. This is not mesh collision avoidance; very close placements can intersect the mannequin. Distance dragging follows the radial path projected into the current workspace view, with inward movement reducing distance and outward movement increasing it.
 
 ## Rotation controls
 
@@ -113,7 +113,7 @@ The executable definitions are:
 
 Classification uses a two-percent-of-frame-height tolerance band around each landmark boundary and retains the previous category while the framing remains inside that band. This prevents rapid label flicker during manipulation. A shot is Unclassified when less than 25 percent of projected subject bounds intersects the frame unless a visible facial landmark supports close framing. Full/Long Shot requires lateral containment as well as head-to-foot visibility. A partly clipped head only implies ECU at sufficiently large subject scale; ambiguous crops return Unclassified. Visible facial detail remains eligible when the torso is outside or behind the lens.
 
-Camera-angle classification considers both camera height and viewing direction. V1 identifies Eye Level, High Angle, Low Angle, and Overhead. Subject-relative viewpoint identifies Front, Three-Quarter Front, Profile, Rear Three-Quarter, and Back based on the subject's forward direction and camera bearing.
+The UI label is Camera level. Lens height alone determines the nearest body landmark from eyes to floor: Eye, Shoulder, Chest, Waist, Hip, Knee, Shin, Tatami, Ankle, Ground. Boundaries fall halfway between adjacent landmark heights, leaving no gaps. Tatami is centered exactly halfway between knee height and floor. Lens tilt and shot-size recognition do not change the height category. Below ground or more than 0.08m above eye height is Unclassified unless overhead applies. Overhead Level requires placement more than 0.05m above the head, within 0.08m of its vertical axis, with the lens within 5 degrees of straight down. Subject-relative viewpoint identifies Front, Three-Quarter Front, Profile, Rear Three-Quarter, and Back based on the subject's forward direction and camera bearing.
 
 Composition identifies centered, left-weighted, and right-weighted placement from the projected subject bounds. Shot size remains independent of horizontal placement when the visible framing is deliberate and classifiable.
 
@@ -164,7 +164,11 @@ Automated unit tests cover:
 
 Component and interaction tests cover mode switching, split-button actions, synchronized controls, prompt copying, and keyboard safety. Browser-level verification covers workspace navigation independence, direct manipulation, live preview synchronization, aspect-ratio framing, and layout usability at 1366 by 768.
 
+Camera level includes Thigh Level between Hip and Knee, centered at the mannequin's 0.73m thigh landmark.
+
 ## V1 exclusions
+
+POV and Over-the-Shoulder are deferred Framing options, not shot-size categories. Their scope and interactions will be designed later.
 
 V1 does not include adjustable focal length, lens presets, camera-shot presets, cinematic-effect explanations, multiple subjects, animated poses, environments, backend services, external AI generation, or public deployment.
 

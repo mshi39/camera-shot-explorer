@@ -8,7 +8,7 @@ export function ShotInformation({ shot }: { shot: ShotClassification }) {
           <dd data-testid="shot-size">{shot.size}</dd>
         </div>
         <div>
-          <dt>Camera angle</dt>
+          <dt>Camera level</dt>
           <dd>
             {shot.angle}
             {shot.dutch ? " · Dutch angle" : ""}

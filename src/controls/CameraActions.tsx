@@ -55,15 +55,17 @@ export function CameraActions() {
     >
       <div className="split-button">
         <button
+          aria-label={primary}
           title={
             mode === "position"
-              ? "Restore position; keep rotation"
-              : "Restore rotation; keep position"
+              ? "Restore position; keep rotation (Shift+R)"
+              : "Restore rotation; keep position (Shift+R)"
           }
           onClick={() => run(primary)}
         >
           <RotateCcw size={13} />
           {primary}
+          <kbd aria-hidden="true">Shift+R</kbd>
         </button>
         <button
           ref={trigger}
@@ -92,6 +94,7 @@ export function CameraActions() {
                 <RotateCcw size={14} />
               )}{" "}
               {action}
+              {action === "Look at Subject" && <kbd aria-hidden="true">L</kbd>}
             </button>
           ))}
         </div>
