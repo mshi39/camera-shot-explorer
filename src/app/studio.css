@@ -215,11 +215,12 @@
 }
 .inspector {
   padding: 20px 24px;
-  scrollbar-width: thin;
-  scrollbar-color: #464b53 transparent;
+  display: flex;
+  flex-direction: column;
 }
 .preview-mat {
-  height: clamp(185px, 30vh, 330px);
+  flex: 1;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -479,8 +480,18 @@
 }
 .prompt-empty {
   color: #7e8792;
-  display: flex;
-  align-items: center;
+}
+.prompt-text {
+  font-size: 14px;
+}
+.preview-heading,
+.shot-information,
+.camera-controls,
+.prompt-panel {
+  flex-shrink: 0;
+}
+.copy-status:empty {
+  display: none;
 }
 .copy-status {
   font-size: 10px;
@@ -488,6 +499,27 @@
   display: block;
   margin-top: 5px;
   min-height: 12px;
+}
+.copy-action {
+  position: relative;
+}
+.copy-toast {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  padding: 6px 9px;
+  border: 1px solid #484c54;
+  border-radius: 4px;
+  background: #292c31;
+  color: #e0e3e7;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px #0004;
+  pointer-events: none;
+}
+.copy-toast:empty {
+  display: none;
 }
 .webgl-fallback {
   display: flex;
@@ -591,9 +623,6 @@ kbd {
   }
 }
 @media (max-width: 700px) {
-  .preview-mat {
-    height: 260px;
-  }
   .workspace-toolbar {
     left: 12px;
     right: 12px;
@@ -621,6 +650,18 @@ kbd {
 .preview-frame.portrait {
   width: min(100cqw, 56.25cqh);
   height: min(100cqh, 177.777778cqw);
+}
+@media (max-height: 700px), (max-width: 700px) {
+  .inspector { padding: 8px 14px; }
+  .inspector .preview-heading { margin-bottom: 6px; }
+  .inspector .preview-heading h1 { margin: 0; }
+  .inspector .shot-information { padding: 8px 0; }
+  .shot-information dl { gap: 6px 12px; }
+  .inspector .camera-controls { padding: 8px 0; }
+  .inspector .section-heading { margin-bottom: 6px; }
+  .inspector .control-row { margin-top: 4px; gap: 2px 12px; }
+  .inspector .prompt-panel { padding-top: 8px; }
+  .inspector .prompt-text, .inspector .prompt-empty { min-height: 0; padding: 8px; line-height: 1.4; }
 }
 @media (min-width: 701px) and (max-height: 800px) {
   .camera-controls {

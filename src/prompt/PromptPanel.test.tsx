@@ -41,6 +41,10 @@ test("refresh is explicit and copy returns the displayed older shot", async () =
   expect(screen.getByText("Out of date")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Copy prompt" }));
   await waitFor(() => expect(clipboard).toBe(text));
+  const toast = await screen.findByText("Copied");
+  expect(toast.closest(".copy-action")).toContainElement(screen.getByRole("button", { name: "Copy prompt" }));
+  expect(document.querySelector(".copy-status")).toBeEmptyDOMElement();
+  await waitFor(() => expect(screen.queryByText("Copied")).not.toBeInTheDocument(), { timeout: 3000 });
   fireEvent.click(screen.getByRole("button", { name: "Refresh prompt" }));
   expect(screen.getByTestId("prompt-text")).toHaveTextContent("9:16");
 });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Copy, RefreshCw, Check } from "lucide-react";
 import { useCameraStore } from "../camera/cameraStore";
 import { useClassification } from "../classification/useClassification";
@@ -9,6 +9,8 @@ export function PromptPanel() {
       revision: number;
     } | null>(null),
     [status, setStatus] = useState("");
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
   const revision = useCameraStore((s) => s.revision),
     shot = useClassification();
   function refresh() {
@@ -21,9 +23,11 @@ export function PromptPanel() {
   }
   async function copy() {
     if (!snapshot) return;
+    clearTimeout(toastTimer.current);
     try {
       await navigator.clipboard.writeText(snapshot.text);
       setStatus("Copied");
+      toastTimer.current = setTimeout(() => setStatus(""), 2000);
     } catch {
       setStatus("Select the prompt text and copy it manually.");
     }
@@ -44,6 +48,7 @@ export function PromptPanel() {
             <RefreshCw size={13} />
             <span>Refresh</span>
           </button>
+          <div className="copy-action">
           <button
             aria-label="Copy prompt"
             title="Copy the displayed prompt"
@@ -52,6 +57,10 @@ export function PromptPanel() {
           >
             {status === "Copied" ? <Check size={14} /> : <Copy size={14} />}
           </button>
+          <span className="copy-toast" role="status">
+            {status === "Copied" ? status : ""}
+          </span>
+          </div>
         </div>
       </div>
       <p
@@ -61,7 +70,7 @@ export function PromptPanel() {
         {snapshot?.text ?? "Click Refresh to generate a prompt."}
       </p>
       <span className="copy-status" role="status">
-        {status}
+        {status !== "Copied" ? status : ""}
       </span>
     </section>
   );
