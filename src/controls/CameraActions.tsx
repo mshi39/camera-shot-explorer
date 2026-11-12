@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "../i18n";
 import { ChevronDown, RotateCcw, Focus } from "lucide-react";
 import { useCameraStore } from "../camera/cameraStore";
 export function CameraActions() {
+  const t = useTranslation();
   const mode = useCameraStore((s) => s.mode),
     [open, setOpen] = useState(false),
     root = useRef<HTMLDivElement>(null),
@@ -55,21 +57,21 @@ export function CameraActions() {
     >
       <div className="split-button">
         <button
-          aria-label={primary}
+          aria-label={t(primary)}
           title={
-            mode === "position"
+            t(mode === "position"
               ? "Restore position; keep rotation (Shift+R)"
-              : "Restore rotation; keep position (Shift+R)"
+              : "Restore rotation; keep position (Shift+R)")
           }
           onClick={() => run(primary)}
         >
           <RotateCcw size={13} />
-          {primary}
+          {t(primary)}
           <kbd aria-hidden="true">Shift+R</kbd>
         </button>
         <button
           ref={trigger}
-          aria-label="More camera actions"
+          aria-label={t("More camera actions")}
           aria-haspopup="menu"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
@@ -93,7 +95,7 @@ export function CameraActions() {
               ) : (
                 <RotateCcw size={14} />
               )}{" "}
-              {action}
+              {t(action)}
               {action === "Look at Subject" && <kbd aria-hidden="true">L</kbd>}
             </button>
           ))}

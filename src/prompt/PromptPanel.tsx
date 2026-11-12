@@ -3,9 +3,15 @@ import { Copy, RefreshCw, Check } from "lucide-react";
 import { useCameraStore } from "../camera/cameraStore";
 import { useClassification } from "../classification/useClassification";
 import { generateShotPrompt } from "./promptGenerator";
+import { useLanguage, useTranslation } from "../i18n";
+import type { ShotClassification } from "../classification/classification";
+import type { FilmingCameraState } from "../camera/cameraTypes";
 export function PromptPanel() {
+  const t = useTranslation();
+  const language = useLanguage((s) => s.language);
   const [snapshot, setSnapshot] = useState<{
-      text: string;
+      shot: ShotClassification;
+      filming: FilmingCameraState;
       revision: number;
     } | null>(null),
     [status, setStatus] = useState("");
@@ -13,10 +19,12 @@ export function PromptPanel() {
   useEffect(() => () => clearTimeout(toastTimer.current), []);
   const revision = useCameraStore((s) => s.revision),
     shot = useClassification();
+  const text = snapshot ? generateShotPrompt(snapshot.shot, snapshot.filming, language) : null;
   function refresh() {
     const s = useCameraStore.getState();
     setSnapshot({
-      text: generateShotPrompt(shot, s.filming),
+      shot: { ...shot },
+      filming: { ...s.filming },
       revision: s.revision,
     });
     setStatus("");
@@ -25,7 +33,7 @@ export function PromptPanel() {
     if (!snapshot) return;
     clearTimeout(toastTimer.current);
     try {
-      await navigator.clipboard.writeText(snapshot.text);
+      await navigator.clipboard.writeText(text!);
       setStatus("Copied");
       toastTimer.current = setTimeout(() => setStatus(""), 2000);
     } catch {
@@ -33,32 +41,32 @@ export function PromptPanel() {
     }
   }
   return (
-    <section className="prompt-panel" aria-label="AI shot prompt">
+    <section className="prompt-panel" aria-label={t("AI shot prompt")}>
       <div className="section-heading">
-        <h2>AI shot prompt</h2>
+        <h2>{t("AI shot prompt")}</h2>
         <div className="prompt-actions">
           {snapshot && snapshot.revision !== revision && (
-            <span className="stale">Out of date</span>
+            <span className="stale">{t("Out of date")}</span>
           )}
           <button
-            aria-label="Refresh prompt"
+            aria-label={t("Refresh prompt")}
             onClick={refresh}
-            title="Generate from the current shot"
+            title={t("Generate from the current shot")}
           >
             <RefreshCw size={13} />
-            <span>Refresh</span>
+            <span>{t("Refresh")}</span>
           </button>
           <div className="copy-action">
           <button
-            aria-label="Copy prompt"
-            title="Copy the displayed prompt"
+            aria-label={t("Copy prompt")}
+            title={t("Copy the displayed prompt")}
             disabled={!snapshot}
             onClick={copy}
           >
             {status === "Copied" ? <Check size={14} /> : <Copy size={14} />}
           </button>
           <span className="copy-toast" role="status">
-            {status === "Copied" ? status : ""}
+            {status === "Copied" ? t(status) : ""}
           </span>
           </div>
         </div>
@@ -67,10 +75,10 @@ export function PromptPanel() {
         data-testid="prompt-text"
         className={snapshot ? "prompt-text" : "prompt-empty"}
       >
-        {snapshot?.text ?? "Click Refresh to generate a prompt."}
+        {text ?? t("Click Refresh to generate a prompt.")}
       </p>
       <span className="copy-status" role="status">
-        {status !== "Copied" ? status : ""}
+        {status !== "Copied" ? t(status) : ""}
       </span>
     </section>
   );

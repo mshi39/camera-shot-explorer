@@ -11,6 +11,9 @@
   color: #969ca5;
 }
 .help-anchor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   position: relative;
   margin-left: auto;
   z-index: 10;
@@ -198,6 +201,33 @@
   margin: 0;
   font-size: 13px;
   letter-spacing: 0.1px;
+}
+.preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.export-action { position: relative; }
+.export-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  font-size: 11px;
+  white-space: nowrap;
+  background: transparent;
+}
+.export-error {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 180px;
+  padding: 8px;
+  background: #292c31;
+  border: 1px solid #484c54;
+  border-radius: 4px;
+  z-index: 5;
+  font-size: 12px;
 }
 .live-label {
   display: flex;

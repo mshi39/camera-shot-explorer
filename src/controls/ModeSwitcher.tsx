@@ -1,8 +1,10 @@
 import { useEffect } from "react";
+import { useTranslation } from "../i18n";
 import { Move, Rotate3D } from "lucide-react";
 import { useCameraStore } from "../camera/cameraStore";
 import type { CameraParameter } from "../camera/cameraTypes";
 export function ModeSwitcher() {
+  const t = useTranslation();
   const mode = useCameraStore((s) => s.mode),
     setMode = useCameraStore((s) => s.setMode);
   useEffect(() => {
@@ -42,24 +44,24 @@ export function ModeSwitcher() {
     return () => window.removeEventListener("keydown", listener);
   }, []);
   return (
-    <div className="mode-switch" role="group" aria-label="Camera mode">
+    <div className="mode-switch" role="group" aria-label={t("Camera mode")}>
       <button
-        title="Move the camera (S)"
-        aria-label="Position mode"
+        title={t("Move the camera (S)")}
+        aria-label={t("Position mode")}
         aria-pressed={mode === "position"}
         onClick={() => setMode("position")}
       >
         <Move size={14} />
-        <span>Position</span>
+        <span>{t("Position")}</span>
       </button>
       <button
-        title="Rotate the camera (S)"
-        aria-label="Rotation mode"
+        title={t("Rotate the camera (S)")}
+        aria-label={t("Rotation mode")}
         aria-pressed={mode === "rotation"}
         onClick={() => setMode("rotation")}
       >
         <Rotate3D size={14} />
-        <span>Rotation</span>
+        <span>{t("Rotation")}</span>
       </button>
       <kbd>S</kbd>
     </div>

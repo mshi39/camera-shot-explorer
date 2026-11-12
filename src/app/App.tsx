@@ -1,5 +1,7 @@
-import { Aperture, Mouse, Move, Rotate3D, CircleHelp } from "lucide-react";
-import { useState } from "react";
+import { Aperture, Mouse, Move, Rotate3D, CircleHelp, Languages } from "lucide-react";
+import { useEffect, useState } from "react";
+import { translate, useLanguage, useTranslation } from "../i18n";
+import { ExportImage } from "../scene/ExportImage";
 import { WorkspaceScene } from "../scene/WorkspaceScene";
 import { CameraPreview } from "../scene/CameraPreview";
 import { ModeSwitcher } from "../controls/ModeSwitcher";
@@ -11,6 +13,13 @@ import { useClassification } from "../classification/useClassification";
 import { useCameraStore } from "../camera/cameraStore";
 import type { CameraParameter } from "../camera/cameraTypes";
 export default function App() {
+  const t = useTranslation();
+  const { language, toggle } = useLanguage();
+  const [previewCanvas, setPreviewCanvas] = useState<HTMLCanvasElement | null>(null);
+  useEffect(() => {
+    document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+    document.title = translate("Camera Shot Explorer", language);
+  }, [language]);
   const shot = useClassification(),
     aspect = useCameraStore((s) => s.filming.aspect),
     mode = useCameraStore((s) => s.mode),
@@ -32,17 +41,18 @@ export default function App() {
     <main className="app">
       <header className="app-header">
         <Aperture size={22} strokeWidth={1.3} />
-        <strong>Camera Shot Explorer</strong>
-        <span>A study in perspective</span>
+        <strong>{t("Camera Shot Explorer")}</strong>
+        <span>{t("A study in perspective")}</span>
         <div
           className="help-anchor"
           onKeyDown={(e) => {
             if (e.key === "Escape") setHelp(false);
           }}
         >
+          <button className="help-toggle" aria-label={language === "en" ? "切换到中文" : "Switch to English"} title={language === "en" ? "切换到中文" : "Switch to English"} onClick={toggle}><Languages size={17} /></button>
           <button
             className="help-toggle"
-            aria-label="Interaction guide"
+            aria-label={t("Interaction guide")}
             aria-expanded={help}
             aria-controls="interaction-guide"
             onClick={() => setHelp(!help)}
@@ -54,23 +64,19 @@ export default function App() {
               id="interaction-guide"
               className="help-panel"
               role="region"
-              aria-label="Interaction guide details"
+              aria-label={t("Interaction guide details")}
             >
-              <strong>Explore your shot</strong>
+              <strong>{t("Explore your shot")}</strong>
               <p>
-                Drag the background to orbit your view. Scroll to zoom the
-                workspace.
+                {t("Drag the background to orbit your view. Scroll to zoom the workspace.")}
               </p>
               <p>
-                Select and drag the camera. Use H / V / D in Position mode or Y
-                / P / R in Rotation mode to restrict dragging to one axis. Press
-                the same key again or Esc to release it.
+                {t("Select and drag the camera. Use H / V / D in Position mode or Y / P / R in Rotation mode to restrict dragging to one axis. Press the same key again or Esc to release it.")}
               </p>
               <p>
-                <kbd>S</kbd> switches modes. <kbd>Shift+R</kbd> resets position or rotation in the active mode.{" "}
-                <kbd>L</kbd> aims at the subject.
+                {t("S switches modes. Shift+R resets position or rotation in the active mode. L aims at the subject.")}
               </p>
-              <button onClick={() => setHelp(false)}>Got it</button>
+              <button onClick={() => setHelp(false)}>{t("Got it")}</button>
             </div>
           )}
         </div>
@@ -78,14 +84,14 @@ export default function App() {
       <div className="studio">
         <section
           className="workspace"
-          aria-label="Interactive 3D scene"
+          aria-label={t("Interactive 3D scene")}
           data-testid="workspace"
         >
           <WorkspaceScene />
           <div className="workspace-toolbar">
             <select
-              title="Output framing"
-              aria-label="Aspect ratio"
+              title={t("Output framing")}
+              aria-label={t("Aspect ratio")}
               value={aspect}
               onChange={(e) =>
                 useCameraStore
@@ -106,17 +112,17 @@ export default function App() {
               ) : (
                 <Rotate3D size={14} />
               )}
-              <span>Camera selected</span>
+              <span>{t("Camera selected")}</span>
               <div
                 className="axis-shortcuts"
                 role="group"
-                aria-label="Restrict camera drag"
+                aria-label={t("Restrict camera drag")}
               >
                 {axes.map(({ key, label }) => (
                   <button
                     key={key}
-                    title={`Restrict drag to ${key} (${label})`}
-                    aria-label={`Select ${key} handle`}
+                    title={language === "zh" ? `限制为${t(key)}拖动（${label}）` : `Restrict drag to ${key} (${label})`}
+                    aria-label={language === "zh" ? `选择${t(key)}控制柄` : `Select ${key} handle`}
                     aria-pressed={activeHandle === key}
                     onClick={() =>
                       useCameraStore
@@ -130,37 +136,39 @@ export default function App() {
               </div>
               <span className="muted" role="status">
                 {activeHandle
-                  ? `${activeHandle} only · Esc to release`
-                  : "Drag camera or handles"}
+                  ? language === "zh" ? `仅${t(activeHandle)} · Esc 取消` : `${activeHandle} only · Esc to release`
+                  : t("Drag camera or handles")}
               </span>
             </div>
             <div className="navigation-hint">
               <Mouse size={13} />
-              <span>Drag background to orbit</span>
+              <span>{t("Drag background to orbit")}</span>
               <span className="hint-divider" />
-              <span>Scroll to zoom</span>
+              <span>{t("Scroll to zoom")}</span>
             </div>
           </div>
         </section>
         <aside className="inspector">
           <div className="preview-heading">
-            <h1>Camera Preview</h1>
+            <h1>{t("Camera Preview")}</h1>
+            <div className="preview-actions">
             <span className="live-label">
               <i />
-              LIVE
+              {t("LIVE")}
             </span>
+            <ExportImage canvas={previewCanvas} />
+            </div>
           </div>
-          <CameraPreview />
+          <CameraPreview onCanvasReady={setPreviewCanvas} />
           <ShotInformation shot={shot} />
           <CameraControls />
           <PromptPanel />
         </aside>
       </div>
       <footer className="app-footer">
-        <span>Explore the frame.</span>
+        <span>{t("Explore the frame.")}</span>
         <span>
-          50mm fixed lens<span className="footer-dot">·</span>Changes saved on
-          this device
+          {t("50mm fixed lens")}<span className="footer-dot">·</span>{t("Changes saved on this device")}
         </span>
       </footer>
     </main>

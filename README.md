@@ -15,6 +15,8 @@ Open http://127.0.0.1:5173. Keep that terminal running. Nothing is published onl
 
 ## Controls
 
+- **Export Image**, beside LIVE, downloads a PNG of the current preview at its rendered resolution and aspect ratio. The download contains only the scene, excluding ratio labels, frame corners, controls, and surrounding letterboxing.
+- The language icon beside Help switches between English and Simplified Chinese and remembers the choice on this device. Existing prompt snapshots are translated without refreshing their camera settings; Refresh remains explicit.
 - Drag the background to orbit your workspace viewpoint. Scroll to zoom the workspace only.
 - Select and drag the camera to change its position. H/V/D handles isolate horizontal orbit, vertical orbit, and distance. Distance follows the radial path on screen: drag toward the subject to move closer, away to move farther. When viewing that path directly end-on, orbit the workspace slightly or use the distance slider.
 - Press **S** or use the Position/Rotation toggle. Press **H/V/D** in Position mode or **Y/P/R** in Rotation mode to restrict camera dragging to one axis; the matching handle is highlighted. Press the same key again or **Esc** to release the restriction. The axis buttons in the workspace footer do the same. Sliders and number fields provide precise values.

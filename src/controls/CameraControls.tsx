@@ -1,4 +1,5 @@
 import { useCameraStore } from "../camera/cameraStore";
+import { useLanguage, useTranslation } from "../i18n";
 import { useState, type CSSProperties } from "react";
 import { CAMERA_LIMITS, type CameraParameter } from "../camera/cameraTypes";
 const labels: Record<CameraParameter, string> = {
@@ -27,6 +28,8 @@ const tips: Record<CameraParameter, string> = {
   roll: "Rotate around the lens axis. At 5° or more, the shot has a Dutch angle.",
 };
 export function CameraControls() {
+  const t = useTranslation();
+  const language = useLanguage((s) => s.language);
   const [draft, setDraft] = useState<{
     key: CameraParameter;
     value: string;
@@ -39,19 +42,19 @@ export function CameraControls() {
       ? ["horizontal", "vertical", "distance"]
       : ["yaw", "pitch", "roll"];
   return (
-    <section className="camera-controls" aria-label="Camera controls">
+    <section className="camera-controls" aria-label={t("Camera controls")}>
       <div className="section-heading">
-        <h2>{mode === "position" ? "Camera position" : "Camera rotation"}</h2>
-        <span>Drag in scene or adjust below</span>
+        <h2>{t(mode === "position" ? "Camera position" : "Camera rotation")}</h2>
+        <span>{t("Drag in scene or adjust below")}</span>
       </div>
       {parameters.map((key) => (
         <div className="control-row" key={key}>
-          <label htmlFor={`slider-${key}`} title={tips[key]}>
-            {labels[key]}
+          <label htmlFor={`slider-${key}`} title={t(tips[key])}>
+            {t(labels[key])}
           </label>
           <div className="number-field">
             <input
-              aria-label={`${labels[key]} value`}
+              aria-label={language === "zh" ? `${t(labels[key])}数值` : `${labels[key]} value`}
               type="number"
               min={CAMERA_LIMITS[key][0]}
               max={CAMERA_LIMITS[key][1]}
@@ -73,7 +76,7 @@ export function CameraControls() {
           </div>
           <input
             id={`slider-${key}`}
-            aria-label={labels[key]}
+            aria-label={t(labels[key])}
             type="range"
             style={{
               "--slider-color": colors[key],

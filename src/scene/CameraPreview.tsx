@@ -18,7 +18,7 @@ function Lens() {
   }, [s]);
   return <FiberCamera ref={ref} makeDefault manual />;
 }
-export function CameraPreview() {
+export function CameraPreview({ onCanvasReady }: { onCanvasReady?: (canvas: HTMLCanvasElement) => void }) {
   const aspect = useCameraStore((x) => x.filming.aspect);
   return (
     <div className="preview-mat">
@@ -29,6 +29,7 @@ export function CameraPreview() {
         <RenderBoundary>
           {supportsWebGL() ? (
             <Canvas
+              onCreated={({ gl }) => onCanvasReady?.(gl.domElement)}
               shadows
               dpr={[1, 1.5]}
               gl={{ antialias: true, preserveDrawingBuffer: true }}

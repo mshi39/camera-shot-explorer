@@ -11,6 +11,7 @@ import { useCameraStore } from "../camera/cameraStore";
 import { DEFAULT_CAMERA_STATE } from "../camera/cameraTypes";
 import { generateShotPrompt } from "./promptGenerator";
 import { classifyShot } from "../classification/classifier";
+import { useLanguage } from "../i18n";
 beforeEach(() =>
   useCameraStore.setState({
     filming: { ...DEFAULT_CAMERA_STATE },
@@ -66,4 +67,19 @@ test("generated prompt uses known shot facts without embellishments", () => {
   );
   expect(text).toContain("10° Dutch tilt");
   expect(text).not.toMatch(/dramatic|lighting|cinematic|mood/);
+});
+
+test("language switching translates the displayed snapshot without refreshing it", () => {
+  render(<PromptPanel />);
+  fireEvent.click(screen.getByRole("button", { name: "Refresh prompt" }));
+  act(() => useCameraStore.getState().updateCamera({ aspect: "9:16", roll: 20 }));
+  act(() => useLanguage.setState({ language: "zh" }));
+  expect(screen.getByTestId("prompt-text")).toHaveTextContent("中景，眼部高度，正面视角");
+  expect(screen.getByTestId("prompt-text")).toHaveTextContent("16:9");
+  expect(screen.getByTestId("prompt-text")).not.toHaveTextContent("荷兰角");
+  expect(screen.getByText("待刷新")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "刷新提示词" }));
+  expect(screen.getByTestId("prompt-text")).toHaveTextContent("9:16");
+  expect(screen.getByTestId("prompt-text")).toHaveTextContent("20° 荷兰角");
+  act(() => useLanguage.setState({ language: "en" }));
 });
